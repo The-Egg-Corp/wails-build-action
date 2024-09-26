@@ -40,10 +40,6 @@ inputs:
     description: "Go version to use"
     required: false
     default: "^1.22"
-  node-uses:
-    description: "Action to use for Node setup"
-    required: false
-    default: "actions/setup-node@v4"
   node-version:
     description: "Version of NodeJS to use"
     required: false
@@ -123,11 +119,11 @@ runs:
 
     # Setup and configure NodeJS
     - name: Setup NodeJS
-      uses: ${{inputs.node-uses}}
+      uses: actions/setup-node@v4
       with:
         node-version: ${{inputs.node-version}}
 
-    # (Optional) Setup Bun
+    # (Optional) Setup and configure Bun
     - name: Setup Bun
       uses: oven-sh/setup-bun@v2
       if: inputs.use-bun

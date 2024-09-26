@@ -8,7 +8,6 @@ By default, the action will build and upload the results to github, on a tagged 
 ### Changelog
 - Added support for Bun setup. Defaults to `false`.
 - Changed `nsis` to be required.
-- Added `node-uses` option to customize which action to use for Node setup.
 - Bumped `upload-artifact`. **v3** -> **@v4**.
 - Bumped `setup-go`. **v4** -> **v5**.
 - Bumped `setup-node`. **v3** -> **v4**.
@@ -16,7 +15,7 @@ By default, the action will build and upload the results to github, on a tagged 
 
 # Default build
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1.1
+- uses: The-Egg-Corp/wails-build-action@v1.2
   with:
     build-name: wailsApp
     build-platform: linux/amd64
@@ -25,7 +24,7 @@ By default, the action will build and upload the results to github, on a tagged 
 
 ## Build with No uploading
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1.1
+- uses: The-Egg-Corp/wails-build-action@v1.2
   with:
     build-name: wailsApp
     build-platform: linux/amd64
@@ -46,7 +45,6 @@ By default, the action will build and upload the results to github, on a tagged 
 | `wails-version`                      | `latest`                 | Wails version to use                                       |
 | `wails-build-webview2`               | `download`               | WebView2 installer method [download, embed, browser, error]|
 | `go-version`                         | `^1.22`                  | Go version to use                                          |
-| `node-uses`                          | `@actions/setup-node@v4` | Action to use for Node setup                               |
 | `node-version`                       | `20`                     | NodeJS version to use                                      |
 | `bun-setup`                          | `false`                  | Whether to setup Bun                                       |
 | `bun-version`                        | `20`                     | Bun version to use                                         |
@@ -86,7 +84,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - uses: The-Egg-Corp/wails-build-action@v1.1
+      - uses: The-Egg-Corp/wails-build-action@v1.2
         with:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
@@ -96,7 +94,7 @@ jobs:
 You need to make two gon configuration files, this is because we need to sign and notarize the .app before making an installer with it.
 
 ```yaml
-  - uses: The-Egg-Corp/wails-build-action@v1.1
+  - uses: The-Egg-Corp/wails-build-action@v1.2
     with:
       build-name: wailsApp
       sign: true
