@@ -1,6 +1,6 @@
 # wails-build-action
 > [!NOTE]
-> This is a fork of [dAppServer/wails-build-action@v2](https://github.com/marketplace/actions/wails-build-action) and is currently not on the marketplace.
+> This is a fork of [dAppServer/wails-build-action](https://github.com/marketplace/actions/wails-build-action).
 
 GitHub action to build a [Wails](https://wails.io) v2 project.
 By default, the action will build and upload the results to github, on a tagged build it will also upload to the release.
@@ -16,18 +16,20 @@ By default, the action will build and upload the results to github, on a tagged 
 
 # Default build
 ```yaml
-- uses: dAppServer/wails-build-action@v2.2
+- uses: The-Egg-Corp/wails-build-action@v1
   with:
     build-name: wailsApp
     build-platform: linux/amd64
+    nsis: false # Set to true to create an installer.
 ```
 
 ## Build with No uploading
 ```yaml
-- uses: dAppServer/wails-build-action@v2.2
+- uses: The-Egg-Corp/wails-build-action@v1
   with:
     build-name: wailsApp
     build-platform: linux/amd64
+    nsis: false
     package: false
 ```
 
@@ -84,7 +86,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - uses: dAppServer/wails-build-action@v2.2
+      - uses: The-Egg-Corp/wails-build-action@v1
         with:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
@@ -94,7 +96,7 @@ jobs:
 You need to make two gon configuration files, this is because we need to sign and notarize the .app before making an installer with it.
 
 ```yaml
-  - uses: dAppServer/wails-build-action@v2.1
+  - uses: The-Egg-Corp/wails-build-action@v1
     with:
       build-name: wailsApp
       sign: true
