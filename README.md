@@ -16,7 +16,7 @@ By default, the action will build and upload the results to github, on a tagged 
 
 # Default build
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1
+- uses: The-Egg-Corp/wails-build-action@v1.1
   with:
     build-name: wailsApp
     build-platform: linux/amd64
@@ -25,7 +25,7 @@ By default, the action will build and upload the results to github, on a tagged 
 
 ## Build with No uploading
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1
+- uses: The-Egg-Corp/wails-build-action@v1.1
   with:
     build-name: wailsApp
     build-platform: linux/amd64
@@ -86,7 +86,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - uses: The-Egg-Corp/wails-build-action@v1
+      - uses: The-Egg-Corp/wails-build-action@v1.1
         with:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
@@ -96,7 +96,7 @@ jobs:
 You need to make two gon configuration files, this is because we need to sign and notarize the .app before making an installer with it.
 
 ```yaml
-  - uses: The-Egg-Corp/wails-build-action@v1
+  - uses: The-Egg-Corp/wails-build-action@v1.1
     with:
       build-name: wailsApp
       sign: true
