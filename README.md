@@ -2,12 +2,12 @@
 > [!NOTE]
 > This is a fork of [dAppServer/wails-build-action](https://github.com/marketplace/actions/wails-build-action).
 
-GitHub action to build a [Wails](https://wails.io) v2 project.
+GitHub Action to build a [Wails](https://wails.io) v2 project.
 By default, the action will build and upload the results to github, on a tagged build it will also upload to the release.
 
 ### Changelog
 - Added support for Bun setup. Defaults to `false`.
-- Changed `nsis` to be required.
+- Changed `nsis` option so that it must be specified.
 - Bumped `upload-artifact`. **v3** -> **@v4**.
 - Bumped `setup-go`. **v4** -> **v5**.
 - Bumped `setup-node`. **v3** -> **v4**.
@@ -47,7 +47,7 @@ By default, the action will build and upload the results to github, on a tagged 
 | `go-version`                         | `^1.22`                  | Go version to use                                          |
 | `node-version`                       | `20`                     | NodeJS version to use                                      |
 | `bun-setup`                          | `false`                  | Whether to setup Bun                                       |
-| `bun-version`                        | `20`                     | Bun version to use                                         |
+| `bun-version`                        | `latest`                 | Bun version to use                                         |
 | `deno-build`                         | ``                       | Deno compile command                                       |
 | `deno-working-directory`             | `.`                      | Working directory of your [Deno](https://deno.land/) server|
 | `deno-version`                       | `v1.20.x`                | Deno version to use                                        |
