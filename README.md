@@ -5,11 +5,14 @@
 GitHub Action to build a [Wails](https://wails.io) v2 project.
 By default, the action will build and upload the results to github, on a tagged build it will also upload to the release.
 
-### Changelog
+## Changelog
+### v1.3
+- Bumped `import-codesign-certs`. **v1** -> **v3**.
+
+### v1.2
 - Added support for Bun setup. Defaults to `false`.
 - Changed `nsis` option so that it must be specified.
 - Bumped `upload-artifact`. **v3** -> **@v4**.
-- Bumped `import-codesign-certs`. **v1** -> **v3**.
 - Bumped `setup-go`. **v4** -> **v5**.
 - Bumped `setup-node`. **v3** -> **v4**.
 - Bumped `node-version` from **18.x** to **20**. This should stop action warnings.
