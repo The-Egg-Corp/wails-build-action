@@ -2,8 +2,8 @@
 > [!NOTE]
 > This is a fork of [dAppServer/wails-build-action](https://github.com/marketplace/actions/wails-build-action).
 
-GitHub Action to build a [Wails](https://wails.io) v2 project.
-By default, the action will build and upload the results to github, on a tagged build it will also upload to the release.
+GitHub Action to build a [Wails](https://wails.io) v2 project.\
+By default, the action will build and upload assets to the workflow, on a tagged build it will also upload them to the release.
 
 ## Changelog
 ### v1.4
