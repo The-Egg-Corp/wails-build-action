@@ -6,6 +6,12 @@ GitHub Action to build a [Wails](https://wails.io) v2 project.
 By default, the action will build and upload the results to github, on a tagged build it will also upload to the release.
 
 ## Changelog
+### v1.4
+- Renamed the `use-bun` option to `setup-bun`.
+- Fixed wrong description of the `build` option.
+- Cleaned up the output name of build assets.
+  - Prev: `Wails Build Linux <build-name>`. Now: `<build-name> (Linux)` 
+
 ### v1.3
 - Bumped `import-codesign-certs`. **v1** -> **v3**.
 
@@ -19,7 +25,7 @@ By default, the action will build and upload the results to github, on a tagged 
 
 ## Default Build
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1.3
+- uses: The-Egg-Corp/wails-build-action@v1.4
   with:
     build-name: wailsApp
     build-platform: linux/amd64
@@ -28,7 +34,7 @@ By default, the action will build and upload the results to github, on a tagged 
 
 ## Build without uploading
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1.3
+- uses: The-Egg-Corp/wails-build-action@v1.4
   with:
     build-name: wailsApp
     build-platform: linux/amd64
@@ -39,9 +45,9 @@ By default, the action will build and upload the results to github, on a tagged 
 ## GitHub Action Options
 | Name                                 | Default                  | Description                                                |
 |--------------------------------------|--------------------------|------------------------------------------------------------|
-| `build-name`                         | none, required input     | The name of the binary                                     |
+| `build-name`                         | (Required) ""            | The name of the binary                                     |
 | `build`                              | `true`                   | Runs `wails build` on your source                          |
-| `nsis`                               | `false`                  | Runs `wails build` with `-nsis` to create an installer     |
+| `nsis`                               | (Required) `false`       | Runs `wails build` with `-nsis` to create an installer     |
 | `sign`                               | `false`                  | After build, signs and creates signed installers           |
 | `package`                            | `true`                   | Upload workflow artifacts & publish release on tag         |
 | `build-platform`                     | `darwin/universal`       | Platform to build for                                      |
@@ -87,7 +93,7 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: The-Egg-Corp/wails-build-action@v1.3
+      - uses: The-Egg-Corp/wails-build-action@v1.4
         with:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
@@ -97,7 +103,7 @@ jobs:
 You need to make two gon configuration files, this is because we need to sign and notarize the .app before making an installer with it.
 
 ```yaml
-  - uses: The-Egg-Corp/wails-build-action@v1.3
+  - uses: The-Egg-Corp/wails-build-action@v1.4
     with:
       build-name: wailsApp
       sign: true

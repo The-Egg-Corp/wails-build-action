@@ -7,7 +7,7 @@ branding:
 
 inputs:
   build:
-    description: "Platform to build for"
+    description: "Run 'wails build'"
     required: false
     default: true
   sign:
@@ -44,8 +44,8 @@ inputs:
     description: "Version of NodeJS to use"
     required: false
     default: 20
-  use-bun:
-    description: "Whether to use Bun"
+  setup-bun:
+    description: "Whether to setup Bun"
     required: false
     default: false
   bun-version:
