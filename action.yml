@@ -1,5 +1,5 @@
-name: Wails Build
-description: Creates a Wails binary. Optionally supports Bun.
+name: Wails v2 Build Action
+description: Creates a Wails binary. Supports Bun & Deno.
 
 branding:
   icon: "archive"
