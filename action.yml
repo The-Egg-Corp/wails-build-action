@@ -1,4 +1,4 @@
-name: Wails v2 Build Action
+name: [v2] Wails Build
 description: Creates a Wails binary. Supports Bun & Deno.
 
 branding:
