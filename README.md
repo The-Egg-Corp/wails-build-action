@@ -9,22 +9,23 @@ By default, the action will build and upload the results to github, on a tagged 
 - Added support for Bun setup. Defaults to `false`.
 - Changed `nsis` option so that it must be specified.
 - Bumped `upload-artifact`. **v3** -> **@v4**.
+- Bumped `import-codesign-certs`. **v1** -> **v3**.
 - Bumped `setup-go`. **v4** -> **v5**.
 - Bumped `setup-node`. **v3** -> **v4**.
 - Bumped `node-version` from **18.x** to **20**. This should stop action warnings.
 
-# Default build
+## Default Build
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1.2
+- uses: The-Egg-Corp/wails-build-action@v1.3
   with:
     build-name: wailsApp
     build-platform: linux/amd64
     nsis: false # Set to true to create an installer.
 ```
 
-## Build with No uploading
+## Build without uploading
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1.2
+- uses: The-Egg-Corp/wails-build-action@v1.3
   with:
     build-name: wailsApp
     build-platform: linux/amd64
@@ -33,7 +34,6 @@ By default, the action will build and upload the results to github, on a tagged 
 ```
 
 ## GitHub Action Options
-
 | Name                                 | Default                  | Description                                                |
 |--------------------------------------|--------------------------|------------------------------------------------------------|
 | `build-name`                         | none, required input     | The name of the binary                                     |
@@ -48,24 +48,22 @@ By default, the action will build and upload the results to github, on a tagged 
 | `node-version`                       | `20`                     | NodeJS version to use                                      |
 | `bun-setup`                          | `false`                  | Whether to setup Bun                                       |
 | `bun-version`                        | `latest`                 | Bun version to use                                         |
-| `deno-build`                         | ``                       | Deno compile command                                       |
+| `deno-build`                         | ""                       | Deno compile command                                       |
 | `deno-working-directory`             | `.`                      | Working directory of your [Deno](https://deno.land/) server|
-| `deno-version`                       | `v1.20.x`                | Deno version to use                                        |
-| `sign-macos-app-id`                  | ''                       | ID of the app signing cert                                 |
-| `sign-macos-apple-password`          | ''                       | MacOS Apple password                                       |
-| `sign-macos-app-cert`                | ''                       | MacOS Application Certificate                              |
-| `sign-macos-app-cert-password`       | ''                       | MacOS Application Certificate Password                     |
-| `sign-macos-installer-id`            | ''                       | MacOS Installer Certificate ID                             |
-| `sign-macos-installer-cert`          | ''                       | MacOS Installer Certificate                                |
-| `sign-macos-installer-cert-password` | ''                       | MacOS Installer Certificate Password                       |
-| `sign-windows-cert`                  | ''                       | Windows Signing Certificate                                |
-| `sign-windows-cert-password`         | ''                       | Windows Signing Certificate Password                       |
-
+| `deno-version`                       | `v1.x`                   | Deno version to use                                        |
+| `sign-macos-app-id`                  | ""                       | MacOS Application Certificate ID                           |
+| `sign-macos-apple-password`          | ""                       | MacOS Apple Password                                       |
+| `sign-macos-app-cert`                | ""                       | MacOS Application Certificate                              |
+| `sign-macos-app-cert-password`       | ""                       | MacOS Application Certificate Password                     |
+| `sign-macos-installer-id`            | ""                       | MacOS Installer Certificate ID                             |
+| `sign-macos-installer-cert`          | ""                       | MacOS Installer Certificate                                |
+| `sign-macos-installer-cert-password` | ""                       | MacOS Installer Certificate Password                       |
+| `sign-windows-cert`                  | ""                       | Windows Signing Certificate                                |
+| `sign-windows-cert-password`         | ""                       | Windows Signing Certificate Password                       |
 
 ## Example Build
-
 ```yaml
-name: Wails build
+name: Wails Build
 
 on: [push, pull_request]
 
@@ -75,16 +73,18 @@ jobs:
       fail-fast: false
       matrix:
         build: [
-          {name: 'App', platform: linux/amd64, os: ubuntu-latest},
-          {name: 'App', platform: windows/amd64, os: windows-latest},
-          {name: 'App', platform: darwin/universal, os: macos-latest}
+          {name: "App", platform: linux/amd64, os: ubuntu-latest},
+          {name: "App", platform: windows/amd64, os: windows-latest},
+          {name: "App", platform: darwin/universal, os: macos-latest}
         ]
+
     runs-on: ${{ matrix.build.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - uses: The-Egg-Corp/wails-build-action@v1.2
+
+      - uses: The-Egg-Corp/wails-build-action@v1.3
         with:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
@@ -94,7 +94,7 @@ jobs:
 You need to make two gon configuration files, this is because we need to sign and notarize the .app before making an installer with it.
 
 ```yaml
-  - uses: The-Egg-Corp/wails-build-action@v1.2
+  - uses: The-Egg-Corp/wails-build-action@v1.3
     with:
       build-name: wailsApp
       sign: true

@@ -67,43 +67,43 @@ inputs:
   deno-version:
     description: "Version of Deno to use"
     required: false
-    default: "v1.20.x"
+    default: "v1.x"
   sign-macos-app-id:
-    description: "MacOS Application Certificate id"
+    description: "MacOS Application Certificate ID"
     required: false
-    default: ''
+    default: ""
   sign-macos-apple-password:
-    description: "MacOS Apple password"
+    description: "MacOS Apple Password"
     required: false
-    default: ''
+    default: ""
   sign-macos-app-cert:
     description: "MacOS Application Certificate"
     required: false
-    default: ''
+    default: ""
   sign-macos-app-cert-password:
     description: "MacOS Application Certificate Password"
     required: false
-    default: ''
+    default: ""
   sign-macos-installer-id:
-    description: "MacOS Installer Certificate id"
+    description: "MacOS Installer Certificate ID"
     required: false
-    default: ''
+    default: ""
   sign-macos-installer-cert:
     description: "MacOS Installer Certificate"
     required: false
-    default: ''
+    default: ""
   sign-macos-installer-cert-password:
     description: "MacOS Installer Certificate Password"
     required: false
-    default: ''
+    default: ""
   sign-windows-cert:
     description: "Windows Signing Certificate"
     required: false
-    default: ''
+    default: ""
   sign-windows-cert-password:
     description: "Windows Signing Certificate Password"
     required: false
-    default: ''
+    default: ""
 
 runs:
   using: "composite"
@@ -189,24 +189,24 @@ runs:
       shell: bash
 
     # Package and Sign MacOS
-    - name: Import Code-Signing Certificates for macOS
+    - name: Import Code-Signing Certificates for MacOS
       if: runner.os == 'macOS' && inputs.sign && startsWith(github.ref, 'refs/tags/')
-      uses: Apple-Actions/import-codesign-certs@v1
+      uses: Apple-Actions/import-codesign-certs@v3
       with:
         keychain-password: ${{ inputs.sign-macos-apple-password }}
         p12-file-base64: ${{ inputs.sign-macos-app-cert }}
         p12-password: ${{ inputs.sign-macos-app-cert-password }}
 
-    - name: Import Code-Signing Certificates for macOS Installer
+    - name: Import Code-Signing Certificates for MacOS Installer
       if: runner.os == 'macOS' && inputs.sign && startsWith(github.ref, 'refs/tags/')
-      uses: Apple-Actions/import-codesign-certs@v1
+      uses: Apple-Actions/import-codesign-certs@v3
       with:
         keychain-password: ${{ inputs.sign-macos-apple-password }}
         p12-file-base64: ${{ inputs.sign-macos-installer-cert }}
         p12-password: ${{ inputs.sign-macos-installer-cert-password }}
         create-keychain: false
 
-    - name: Sign our macOS binary
+    - name: Sign our MacOS binary
       if: runner.os == 'macOS' && inputs.sign && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
@@ -237,7 +237,7 @@ runs:
       run: |
         productbuild --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.pkg
     
-    - name: Notarising Installer and zip
+    - name: Notarising Installer and ZIP
       if: runner.os == 'macOS' && inputs.sign && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
