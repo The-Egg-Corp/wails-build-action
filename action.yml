@@ -1,5 +1,5 @@
-name: [v2] Wails Build
-description: Creates a Wails binary. Supports Bun & Deno.
+name: "[v2] Wails Build"
+description: "Creates a Wails binary. Supports Bun & Deno."
 
 branding:
   icon: "archive"
@@ -261,10 +261,10 @@ runs:
         echo "Signing Installer" & 'C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe' sign /fd sha256 /tr http://ts.ssl.com /f certificate\certificate.pfx /p '${{ inputs.sign-windows-cert-password }}' .\build\bin\${{inputs.build-name}}-amd64-installer.exe
 
     # Upload build assets
-    - uses: actions/upload-artifact@v4
+    uses: actions/upload-artifact@v4
       if: inputs.package == 'true'
       with:
-        name: Wails Build ${{runner.os}} ${{inputs.build-name}}
+        name: ${{inputs.build-name}} (${{runner.os}})
         path: |
           */bin/
           *\bin\*
