@@ -126,7 +126,7 @@ runs:
     # (Optional) Setup and configure Bun
     - name: Setup Bun
       uses: oven-sh/setup-bun@v2
-      if: inputs.setup-bun
+      if: inputs.setup-bun == 'true'
       with:
         bun-version: ${{inputs.bun-version}}
 
@@ -144,11 +144,11 @@ runs:
 
     # Install Wails & Platform Deps
     - name: Install Wails
-      if: inputs.build
+      if: inputs.build == 'true'
       run: go install github.com/wailsapp/wails/v2/cmd/wails@${{inputs.wails-version}}
       shell: bash
     - name: Install Linux Wails deps
-      if: inputs.build && runner.os == 'Linux'
+      if: inputs.build == 'true' && runner.os == 'Linux'
       run: sudo apt-get update && sudo apt-get install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
       shell: bash
     - name: Install MacOS Wails deps
@@ -157,40 +157,40 @@ runs:
       shell: bash
 
     # Build Step
-    - name: Build App
-      if: inputs.build && runner.os == 'macOS'
-      working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}
-      shell: bash
-    - name: Build App
-      if: inputs.build && runner.os == 'Linux'
-      working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}
-      shell: bash
     - name: Build Windows App
-      if: inputs.build && !inputs.nsis && runner.os == 'Windows'
+      if: inputs.build == 'true' && inputs.nsis == 'false' && runner.os == 'Windows'
       working-directory: ${{ inputs.app-working-directory }}
       run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}
       shell: bash
     - name: Build Windows App + Installer
-      if: inputs.build && inputs.nsis && runner.os == 'Windows' 
+      if: inputs.build == 'true' && inputs.nsis == 'true' && runner.os == 'Windows' 
       working-directory: ${{ inputs.app-working-directory }}
       run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -nsis -o ${{inputs.build-name}}
       shell: bash
+    - name: Build App
+      if: inputs.build == 'true' && runner.os == 'macOS'
+      working-directory: ${{ inputs.app-working-directory }}
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}
+      shell: bash
+    - name: Build App
+      if: inputs.build == 'true' && runner.os == 'Linux'
+      working-directory: ${{ inputs.app-working-directory }}
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}
+      shell: bash
     - name: Add MacOS perms
-      if: inputs.build && runner.os == 'macOS'
+      if: inputs.build == 'true' && runner.os == 'macOS'
       working-directory: ${{ inputs.app-working-directory }}
       run: chmod +x build/bin/*/Contents/MacOS/*
       shell: bash
     - name: Add Linux perms
-      if: inputs.build && runner.os  == 'Linux'
+      if: inputs.build == 'true' && runner.os == 'Linux'
       working-directory: ${{ inputs.app-working-directory }}
       run: chmod +x build/bin/*
       shell: bash
 
     # Package and Sign MacOS
     - name: Import Code-Signing Certificates for MacOS
-      if: runner.os == 'macOS' && inputs.sign && startsWith(github.ref, 'refs/tags/')
+      if: runner.os == 'macOS' && inputs.sign == 'true' && startsWith(github.ref, 'refs/tags/')
       uses: Apple-Actions/import-codesign-certs@v3
       with:
         keychain-password: ${{ inputs.sign-macos-apple-password }}
@@ -198,7 +198,7 @@ runs:
         p12-password: ${{ inputs.sign-macos-app-cert-password }}
 
     - name: Import Code-Signing Certificates for MacOS Installer
-      if: runner.os == 'macOS' && inputs.sign && startsWith(github.ref, 'refs/tags/')
+      if: runner.os == 'macOS' && inputs.sign == 'true' && startsWith(github.ref, 'refs/tags/')
       uses: Apple-Actions/import-codesign-certs@v3
       with:
         keychain-password: ${{ inputs.sign-macos-apple-password }}
@@ -207,7 +207,7 @@ runs:
         create-keychain: false
 
     - name: Sign our MacOS binary
-      if: runner.os == 'macOS' && inputs.sign && startsWith(github.ref, 'refs/tags/')
+      if: runner.os == 'macOS' && inputs.sign == 'true' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       env:
@@ -224,7 +224,7 @@ runs:
         ditto -c -k ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app.zip
 
     - name: Building Installer
-      if: runner.os == 'macOS' && inputs.sign && inputs.sign-macos-installer-id != '' && startsWith(github.ref, 'refs/tags/')
+      if: runner.os == 'macOS' && inputs.sign == 'true' && inputs.sign-macos-installer-id != '' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       run: |
@@ -238,7 +238,7 @@ runs:
         productbuild --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.pkg
     
     - name: Notarising Installer and ZIP
-      if: runner.os == 'macOS' && inputs.sign && startsWith(github.ref, 'refs/tags/')
+      if: runner.os == 'macOS' && inputs.sign == 'true' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       env:
@@ -249,7 +249,7 @@ runs:
     # Windows signing
     - name: Sign Windows binaries
       shell: powershell
-      if: runner.os == 'Windows' && inputs.sign && inputs.sign-windows-cert != ''
+      if: runner.os == 'Windows' && inputs.sign == 'true' && inputs.sign-windows-cert != ''
       working-directory: ${{ inputs.app-working-directory }}
       run: |
         echo "Creating certificate file"
