@@ -2,8 +2,8 @@
 > [!NOTE]
 > This is a fork of [dAppServer/wails-build-action](https://github.com/marketplace/actions/wails-build-action).
 
-GitHub Action to build a [Wails](https://wails.io) v2 project.
-By default, the action will build and upload the results to github, on a tagged build it will also upload to the release.
+GitHub Action to build a [Wails](https://wails.io) v2 project.\
+By default, the action will build and upload assets to the workflow, on a tagged build it will also upload them to the release.
 
 ## Changelog
 ### v1.4
@@ -45,9 +45,9 @@ By default, the action will build and upload the results to github, on a tagged 
 ## GitHub Action Options
 | Name                                 | Default                  | Description                                                |
 |--------------------------------------|--------------------------|------------------------------------------------------------|
-| `build-name`                         | (Required) ""            | The name of the binary                                     |
+| `build-name`                         | (Required)               | The name of the binary                                     |
 | `build`                              | `true`                   | Runs `wails build` on your source                          |
-| `nsis`                               | (Required) `false`       | Runs `wails build` with `-nsis` to create an installer     |
+| `nsis`                               | (Required)               | Runs `wails build` with `-nsis` to create an installer     |
 | `sign`                               | `false`                  | After build, signs and creates signed installers           |
 | `package`                            | `true`                   | Upload workflow artifacts & publish release on tag         |
 | `build-platform`                     | `darwin/universal`       | Platform to build for                                      |
@@ -71,10 +71,31 @@ By default, the action will build and upload the results to github, on a tagged 
 | `sign-windows-cert-password`         | ""                       | Windows Signing Certificate Password                       |
 
 ## Example Build
+This example uses a manual trigger, you may want to use `on: [push, pull_request]` instead.
+
 ```yaml
 name: Wails Build
 
-on: [push, pull_request]
+on:
+  # Allows workflow to be manually triggered.
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        type: choice
+        options: [info, warning, debug]
+        default: "warning"
+      nsis:
+        description: "Create installer"
+        type: boolean
+        required: true
+        default: false
+      package: 
+        description: "Upload artifacts"
+        type: boolean
+        required: false
+        default: true
 
 jobs:
   build:
@@ -120,22 +141,23 @@ You need to make two gon configuration files, this is because we need to sign an
 `build/darwin/gon-sign.json`
 ```json
 {
-  "source" : ["./build/bin/wailsApp.app"],
-  "bundle_id" : "com.wails.app",
+  "source": ["./build/bin/wailsApp.app"],
+  "bundle_id": "com.wails.app",
   "apple_id": {
     "username": "username",
     "password": "@env:APPLE_PASSWORD"
   },
-  "sign" :{
-    "application_identity" : "Developer ID Application: XXXXXXXX (XXXXXX)",
+  "sign": {
+    "application_identity": "Developer ID Application: XXXXXXXX (XXXXXX)",
     "entitlements_file": "./build/darwin/entitlements.plist"
   },
-  "dmg" :{
-    "output_path":  "./build/bin/wailsApp.dmg",
-    "volume_name":  "Lethean"
+  "dmg": {
+    "output_path": "./build/bin/wailsApp.dmg",
+    "volume_name": "Lethean"
   }
 }
 ```
+
 `build/darwin/gon-notarize.json`
 ```json
 {
@@ -154,6 +176,7 @@ You need to make two gon configuration files, this is because we need to sign an
   }
 }
 ```
+
 `build/darwin/entitlements.plist`
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
