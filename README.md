@@ -45,9 +45,9 @@ By default, the action will build and upload assets to the workflow, on a tagged
 ## GitHub Action Options
 | Name                                 | Default                  | Description                                                |
 |--------------------------------------|--------------------------|------------------------------------------------------------|
-| `build-name`                         | "" (Required)            | The name of the binary                                     |
+| `build-name`                         | (Required)               | The name of the binary                                     |
 | `build`                              | `true`                   | Runs `wails build` on your source                          |
-| `nsis`                               | `false` (Required)       | Runs `wails build` with `-nsis` to create an installer     |
+| `nsis`                               | (Required)               | Runs `wails build` with `-nsis` to create an installer     |
 | `sign`                               | `false`                  | After build, signs and creates signed installers           |
 | `package`                            | `true`                   | Upload workflow artifacts & publish release on tag         |
 | `build-platform`                     | `darwin/universal`       | Platform to build for                                      |
