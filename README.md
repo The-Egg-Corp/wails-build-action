@@ -17,8 +17,8 @@ By default, the action will build and upload assets to the workflow, on a tagged
 
 ### v1.2
 - Added support for Bun setup. Defaults to `false`.
-- Changed `nsis` option so that it must be specified.
-- Bumped `upload-artifact`. **v3** -> **@v4**.
+- Changed `nsis` option so that it *must* be specified.
+- Bumped `upload-artifact`. **v3** -> **v4**.
 - Bumped `setup-go`. **v4** -> **v5**.
 - Bumped `setup-node`. **v3** -> **v4**.
 - Bumped `node-version` from **18.x** to **20**. This should stop action warnings.
