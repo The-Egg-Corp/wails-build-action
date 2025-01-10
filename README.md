@@ -55,7 +55,7 @@ By default, the action will build and upload assets to the workflow, on a tagged
 | `wails-build-webview2`               | `download`               | WebView2 installer method [download, embed, browser, error]|
 | `go-version`                         | `^1.22`                  | Go version to use                                          |
 | `node-version`                       | `20`                     | NodeJS version to use                                      |
-| `bun-setup`                          | `false`                  | Whether to setup Bun                                       |
+| `setup-bun`                          | `false`                  | Whether to setup Bun                                       |
 | `bun-version`                        | `latest`                 | Bun version to use                                         |
 | `deno-build`                         | ""                       | Deno compile command                                       |
 | `deno-working-directory`             | `.`                      | Working directory of your [Deno](https://deno.land/) server|
