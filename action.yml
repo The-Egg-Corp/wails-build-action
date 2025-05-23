@@ -167,6 +167,7 @@ runs:
           build_options+=' -nsis'
         fi
         echo "BUILD_OPTIONS=$build_options" >> "$GITHUB_OUTPUT"
+        
     # Setup and configure GoLang
     - name: Setup GoLang
       uses: actions/setup-go@v5
@@ -182,6 +183,20 @@ runs:
       shell: bash
     - run: go version
       shell: bash
+
+    # Setup and configure NodeJS
+    - name: Setup NodeJS
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{inputs.node-version}}
+
+    # (Optional) Setup and configure Bun
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      if: inputs.setup-bun == 'true'
+      with:
+        bun-version: ${{inputs.bun-version}}
+
     # (Optional) Setup and configure Deno
     - name: Setup Deno
       uses: denoland/setup-deno@v2
