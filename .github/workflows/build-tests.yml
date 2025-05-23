@@ -33,18 +33,6 @@ jobs:
           build-platform: linux/amd64
           wails-build-webview2: "embed"
           package: false # Do not try to upload to github
-  ubuntu2004:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - uses: dAppServer/wails-build-action@main
-        with:
-          build-name: wails
-          build-platform: linux/amd64
-          wails-build-webview2: "embed"
-          package: false # Do not try to upload to github
   ubuntu-obfuscate:
     runs-on: ubuntu-latest
     steps:
