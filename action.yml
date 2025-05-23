@@ -34,7 +34,7 @@ inputs:
   build-platform:
     description: "Target platform to build for. Must be supported by Wails."
     required: false
-    default: "windows-latest"
+    default: "windows/amd64"
   build-tags:
     description: "Build tags to pass to Go compiler. Must be quoted. Space or comma (but not both) separated"
     required: false
@@ -295,13 +295,14 @@ runs:
       run: |
         productbuild --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app /Applications ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.pkg
     - name: Notarising Installer and zip
-      if: runner.os == 'macOS' && inputs.sign != 'false' && startsWith(github.ref, 'refs/tags/')
+      if: runner.os == 'macOS' && inputs.sign == 'true' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       env:
         APPLE_PASSWORD: ${{ inputs.sign-macos-apple-password }}
       run: |
         gon -log-level=info ${{ inputs.app-working-directory }}/build/darwin/gon-notarize.json
+
     # Windows signing
     - name: Sign Windows binaries
       shell: powershell
