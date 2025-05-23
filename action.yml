@@ -21,13 +21,16 @@ inputs:
   nsis:
     description: "Build a Windows Installer"
     required: true
+  name: 
+    description: "The name/title of the application. Used when naming the zip archive."
+    required: true
   build-name:
-    description: "The name of the binary file"
+    description: "The name of the binary/output file. An extension can be specified here if it is not already included."
     required: true
   build-platform:
-    description: "Platform to build for"
+    description: "Target platform to build for. Must be supported by Wails."
     required: false
-    default: "darwin/universal"
+    default: "windows-latest"
   wails-version:
     description: "Wails version to use"
     required: false
@@ -149,7 +152,7 @@ runs:
       shell: bash
     - name: Install Linux Wails deps
       if: inputs.build == 'true' && runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
+      run: sudo apt-get update && sudo apt-get install libgtk-3-0 libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev gcc-aarch64-linux-gnu
       shell: bash
     - name: Install MacOS Wails deps
       if: runner.os == 'macOS'
@@ -264,7 +267,7 @@ runs:
     - uses: actions/upload-artifact@v4
       if: inputs.package == 'true'
       with:
-        name: ${{inputs.build-name}} (${{runner.os}})
+        name: ${{inputs.name}} ${{runner.os}}
         path: |
           */bin/
           *\bin\*

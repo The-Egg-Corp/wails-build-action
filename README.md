@@ -5,76 +5,61 @@
 GitHub Action to build a [Wails](https://wails.io) v2 project.\
 By default, the action will build and upload assets to the workflow, on a tagged build it will also upload them to the release.
 
-## Changelog
-### v1.4
-- Renamed the `use-bun` option to `setup-bun`.
-- Fixed wrong description of the `build` option.
-- Cleaned up the output name of build assets.
-  - Prev: `Wails Build Linux <build-name>`. Now: `<build-name> (Linux)` 
-
-### v1.3
-- Bumped `import-codesign-certs`. **v1** -> **v3**.
-
-### v1.2
-- Added support for Bun setup. Defaults to `false`.
-- Changed `nsis` option so that it *must* be specified.
-- Bumped `upload-artifact`. **v3** -> **v4**.
-- Bumped `setup-go`. **v4** -> **v5**.
-- Bumped `setup-node`. **v3** -> **v4**.
-- Bumped `node-version` from **18.x** to **20**. This should stop action warnings.
+## Available Options
+| Name                                 | Default                  | Description                                                     |
+|--------------------------------------|--------------------------|-----------------------------------------------------------------|
+| `name`                               | (Required)               | The name/title of the app. Used when naming the zip/artifact.   |
+| `build-name`                         | (Required)               | The name of the output file. Equivelent to `-o <name>`.         |
+| `build-platform`                     | `windows/amd64`          | Platform to target the build for. See [supported platforms](https://wails.io/docs/reference/cli#platforms).|
+| `build`                              | `true`                   | Runs `wails build` on your source.                              |
+| `nsis`                               | (Required)               | Runs `wails build` with `-nsis` to create a Windows installer.  |
+| `sign`                               | `false`                  | After build, signs and creates signed installers.               |
+| `package`                            | `true`                   | Upload workflow artifacts & publish release on tag.             |
+| `wails-version`                      | `latest`                 | Wails version to use.                                           |
+| `wails-build-webview2`               | `download`               | WebView2 installer method. [Download, Embed, Browser, Error]    |
+| `go-version`                         | `^1.22`                  | Go version to use.                                              |
+| `node-version`                       | `20`                     | NodeJS version to use.                                          |
+| `bun-setup`                          | `false`                  | Whether to setup Bun.                                           |
+| `bun-version`                        | `latest`                 | Bun version to use.                                             |
+| `deno-build`                         | ""                       | Deno compile command.                                           |
+| `deno-working-directory`             | `.`                      | Working directory of your [Deno](https://deno.land/) server.    |
+| `deno-version`                       | `v1.x`                   | Deno version to use.                                            |
+| `sign-macos-app-id`                  | ""                       | MacOS Application Certificate ID                                |
+| `sign-macos-apple-password`          | ""                       | MacOS Apple Password                                            |
+| `sign-macos-app-cert`                | ""                       | MacOS Application Certificate                                   |
+| `sign-macos-app-cert-password`       | ""                       | MacOS Application Certificate Password                          |
+| `sign-macos-installer-id`            | ""                       | MacOS Installer Certificate ID                                  |
+| `sign-macos-installer-cert`          | ""                       | MacOS Installer Certificate                                     |
+| `sign-macos-installer-cert-password` | ""                       | MacOS Installer Certificate Password                            |
+| `sign-windows-cert`                  | ""                       | Windows Signing Certificate                                     |
+| `sign-windows-cert-password`         | ""                       | Windows Signing Certificate Password                            |
 
 ## Default Build
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1.4
+- uses: The-Egg-Corp/wails-build-action@v2
   with:
-    build-name: wailsApp
-    build-platform: linux/amd64
+    name: Wails App
+    build-name: wailsApp.exe
+    build-platform: windows/amd64
     nsis: false # Set to true to create an installer.
 ```
 
-## Build without uploading
+## Default Build (No upload)
 ```yaml
-- uses: The-Egg-Corp/wails-build-action@v1.4
+- uses: The-Egg-Corp/wails-build-action@v2
   with:
-    build-name: wailsApp
-    build-platform: linux/amd64
+    name: Wails App
+    build-name: wailsApp.exe
+    build-platform: windows/amd64
     nsis: false
     package: false
 ```
-
-## GitHub Action Options
-| Name                                 | Default                  | Description                                                |
-|--------------------------------------|--------------------------|------------------------------------------------------------|
-| `build-name`                         | (Required)               | The name of the binary                                     |
-| `build`                              | `true`                   | Runs `wails build` on your source                          |
-| `nsis`                               | (Required)               | Runs `wails build` with `-nsis` to create an installer     |
-| `sign`                               | `false`                  | After build, signs and creates signed installers           |
-| `package`                            | `true`                   | Upload workflow artifacts & publish release on tag         |
-| `build-platform`                     | `darwin/universal`       | Platform to build for                                      |
-| `wails-version`                      | `latest`                 | Wails version to use                                       |
-| `wails-build-webview2`               | `download`               | WebView2 installer method [download, embed, browser, error]|
-| `go-version`                         | `^1.22`                  | Go version to use                                          |
-| `node-version`                       | `20`                     | NodeJS version to use                                      |
-| `setup-bun`                          | `false`                  | Whether to setup Bun                                       |
-| `bun-version`                        | `latest`                 | Bun version to use                                         |
-| `deno-build`                         | ""                       | Deno compile command                                       |
-| `deno-working-directory`             | `.`                      | Working directory of your [Deno](https://deno.land/) server|
-| `deno-version`                       | `v1.x`                   | Deno version to use                                        |
-| `sign-macos-app-id`                  | ""                       | MacOS Application Certificate ID                           |
-| `sign-macos-apple-password`          | ""                       | MacOS Apple Password                                       |
-| `sign-macos-app-cert`                | ""                       | MacOS Application Certificate                              |
-| `sign-macos-app-cert-password`       | ""                       | MacOS Application Certificate Password                     |
-| `sign-macos-installer-id`            | ""                       | MacOS Installer Certificate ID                             |
-| `sign-macos-installer-cert`          | ""                       | MacOS Installer Certificate                                |
-| `sign-macos-installer-cert-password` | ""                       | MacOS Installer Certificate Password                       |
-| `sign-windows-cert`                  | ""                       | Windows Signing Certificate                                |
-| `sign-windows-cert-password`         | ""                       | Windows Signing Certificate Password                       |
 
 ## Example Build
 This example uses a manual trigger, you may want to use `on: [push, pull_request]` instead.
 
 ```yaml
-name: Wails Build
+name: Cross-platform Build
 
 on:
   # Allows workflow to be manually triggered.
@@ -90,7 +75,6 @@ on:
         description: "Create installer"
         type: boolean
         required: true
-        default: false
       package: 
         description: "Upload artifacts"
         type: boolean
@@ -103,9 +87,9 @@ jobs:
       fail-fast: false
       matrix:
         build: [
-          {name: "App", platform: linux/amd64, os: ubuntu-latest},
-          {name: "App", platform: windows/amd64, os: windows-latest},
-          {name: "App", platform: darwin/universal, os: macos-latest}
+          { name: "wailsApp.exe", platform: windows/amd64, os: windows-latest },
+          { name: "wailsApp", platform: linux/amd64, os: ubuntu-latest },
+          { name: "wailsApp", platform: darwin/universal, os: macos-latest }
         ]
 
     runs-on: ${{ matrix.build.os }}
@@ -114,18 +98,22 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: The-Egg-Corp/wails-build-action@v1.4
+      - uses: The-Egg-Corp/wails-build-action@v2
         with:
+          name: Wails App
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
+          nsis: ${{ inputs.nsis }}
+          package: ${{ inputs.package }}
 ```
 
 ## MacOS Code Signing
 You need to make two gon configuration files, this is because we need to sign and notarize the .app before making an installer with it.
 
 ```yaml
-  - uses: The-Egg-Corp/wails-build-action@v1.4
+  - uses: The-Egg-Corp/wails-build-action@v2
     with:
+      name: Wails App
       build-name: wailsApp
       sign: true
       build-platform: darwin/universal
