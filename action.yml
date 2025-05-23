@@ -27,10 +27,22 @@ inputs:
   build-name:
     description: "The name of the binary/output file. An extension can be specified here if it is not already included."
     required: true
+  build-cache:
+    description: "Cache the build"
+    required: false
+    default: "true"
   build-platform:
     description: "Target platform to build for. Must be supported by Wails."
     required: false
     default: "windows-latest"
+  build-tags:
+    description: "Build tags to pass to Go compiler. Must be quoted. Space or comma (but not both) separated"
+    required: false
+    default: "false"
+  build-obfuscate:
+    description: "Obfuscate the build"
+    required: false
+    default: "false"
   wails-version:
     description: "Wails version to use"
     required: false
@@ -42,7 +54,7 @@ inputs:
   go-version:
     description: "Go version to use"
     required: false
-    default: "^1.22"
+    default: "1.23"
   node-version:
     description: "Version of NodeJS to use"
     required: false
@@ -106,36 +118,73 @@ inputs:
   sign-windows-cert-password:
     description: "Windows Signing Certificate Password"
     required: false
-    default: ""
-
+    default: ''
+  wails-dev-build:
+    description: "Use provided wails"
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
-    # Setup and configure Go
-    - name: Setup Go
+    - name: Linux Discovery
+      if: runner.os == 'Linux'
+      id: linux_discovery
+      run: |
+        sudo apt-get -yq update
+        DISTRO=$(lsb_release -rs) # Get the distribution version (e.g., "22.04", "24.04")
+        if [[ "$DISTRO" == "20.04" ]]; then
+          sudo apt-get -yq install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
+        elif [[ "$DISTRO" == "22.04" ]]; then
+          sudo apt-get -yq install libgtk-3-0 libwebkit2gtk-4.0-dev gcc-aarch64-linux-gnu
+        elif [[ "$DISTRO" == "24.04" ]]; then
+          sudo apt-get -yq install libgtk-3-0 libwebkit2gtk-4.1-dev gcc-aarch64-linux-gnu
+        else
+          echo "Unsupported Linux distribution: $DISTRO"
+          exit 1 # Fail the workflow if the distribution is not supported
+        fi
+        echo "DISTRO=$DISTRO" >> "$GITHUB_OUTPUT"
+      shell: bash
+    - name: Setup Build Options
+      id: build_options
+      shell: bash
+      env:
+        DISTRO: ${{ steps.linux_discovery.outputs.DISTRO }}
+      run: |
+        build_options=""
+        if ${{ inputs.build-obfuscate == 'true' }}; then
+          build_options+=' -obfuscated'
+        fi
+        if [[ "${{ inputs.build-tags }}" != "false" ]]; then
+          tags_string="${{ inputs.build-tags }}"
+          if [[ "$DISTRO" == '24.04' ]]; then
+            tags_string+=" webkit2_41"
+          fi
+          build_options+=" -tags $tags_string" 
+        elif [[ "${{ inputs.build-tags }}" == "false" && "$DISTRO" == '24.04' ]]; then 
+          build_options+=" -tags webkit2_41"
+        fi
+        if ${{ inputs.nsis == 'true' }}; then
+          build_options+=' -nsis'
+        fi
+        echo "BUILD_OPTIONS=$build_options" >> "$GITHUB_OUTPUT"
+    # Setup and configure GoLang
+    - name: Setup GoLang
       uses: actions/setup-go@v5
+      if: inputs.wails-dev-build == 'false'
       with:
         check-latest: true
-        go-version: ${{inputs.go-version}}
+        cache: ${{ inputs.build-cache }}
+        cache-dependency-path: 'go.sum'
+        go-version: ${{ inputs.go-version }}
+    - name: Install Garble
+      if: inputs.build-obfuscate == 'true'
+      run: go install mvdan.cc/garble@latest
+      shell: bash
     - run: go version
       shell: bash
-
-    # Setup and configure NodeJS
-    - name: Setup NodeJS
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{inputs.node-version}}
-
-    # (Optional) Setup and configure Bun
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v2
-      if: inputs.setup-bun == 'true'
-      with:
-        bun-version: ${{inputs.bun-version}}
-
     # (Optional) Setup and configure Deno
     - name: Setup Deno
-      uses: denoland/setup-deno@v1
+      uses: denoland/setup-deno@v2
       if: inputs.deno-build != ''
       with:
         deno-version: ${{inputs.deno-version}}
@@ -147,14 +196,10 @@ runs:
 
     # Install Wails & Platform Deps
     - name: Install Wails
-      if: inputs.build == 'true'
+      if: inputs.build == 'true' && inputs.wails-dev-build == 'false'
       run: go install github.com/wailsapp/wails/v2/cmd/wails@${{inputs.wails-version}}
       shell: bash
-    - name: Install Linux Wails deps
-      if: inputs.build == 'true' && runner.os == 'Linux'
-      run: sudo apt-get update && sudo apt-get install libgtk-3-0 libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev gcc-aarch64-linux-gnu
-      shell: bash
-    - name: Install MacOS Wails deps
+    - name: Install macOS Wails deps
       if: runner.os == 'macOS'
       run: brew install mitchellh/gon/gon
       shell: bash
@@ -171,16 +216,13 @@ runs:
       run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -nsis -o ${{inputs.build-name}}
       shell: bash
     - name: Build App
-      if: inputs.build == 'true' && runner.os == 'macOS'
+      if: inputs.build == 'true'
+      env:
+        BUILD_OPTIONS: ${{ steps.build_options.outputs.BUILD_OPTIONS }}
       working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}
+      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} $BUILD_OPTIONS
       shell: bash
-    - name: Build App
-      if: inputs.build == 'true' && runner.os == 'Linux'
-      working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}}
-      shell: bash
-    - name: Add MacOS perms
+    - name: Add macOS perms
       if: inputs.build == 'true' && runner.os == 'macOS'
       working-directory: ${{ inputs.app-working-directory }}
       run: chmod +x build/bin/*/Contents/MacOS/*
@@ -224,31 +266,27 @@ runs:
       working-directory: ${{ inputs.app-working-directory }}
       shell: bash
       run: |
-        ditto -c -k ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app.zip
-
+        ditto -c -k --keepParent ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app.zip
     - name: Building Installer
       if: runner.os == 'macOS' && inputs.sign == 'true' && inputs.sign-macos-installer-id != '' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       run: |
-        productbuild --sign '${{inputs.sign-macos-installer-id}}' --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.pkg
-    
+        productbuild --sign '${{inputs.sign-macos-installer-id}}' --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app /Applications ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.pkg
     - name: Building Installer
       if: runner.os == 'macOS' && inputs.sign-macos-installer-id == '' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       run: |
-        productbuild --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.pkg
-    
-    - name: Notarising Installer and ZIP
-      if: runner.os == 'macOS' && inputs.sign == 'true' && startsWith(github.ref, 'refs/tags/')
+        productbuild --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app /Applications ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.pkg
+    - name: Notarising Installer and zip
+      if: runner.os == 'macOS' && inputs.sign != 'false' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       env:
         APPLE_PASSWORD: ${{ inputs.sign-macos-apple-password }}
       run: |
-        gon -log-level=info ${{ inputs.app-working-directory }}/build/darwin/gon-notarize.json     
-
+        gon -log-level=info ${{ inputs.app-working-directory }}/build/darwin/gon-notarize.json
     # Windows signing
     - name: Sign Windows binaries
       shell: powershell
