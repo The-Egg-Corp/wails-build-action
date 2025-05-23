@@ -30,7 +30,7 @@ inputs:
   build-platform:
     description: "Target platform to build for. Must be supported by Wails."
     required: false
-    default: "windows-latest"
+    default: "windows/amd64"
   wails-version:
     description: "Wails version to use"
     required: false
